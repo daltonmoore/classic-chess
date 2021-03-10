@@ -19,6 +19,12 @@ class CHESTERCHESS_API ABoardSpawn : public AActor
 
 		UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 		class UStaticMeshComponent* ChessSquare;
+
+		UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+		class UStaticMeshComponent* ChessPiece;
+		
+		/*UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+		class UMaterial* PieceColor;*/
 	
 public:	
 	// Sets default values for this actor's properties
@@ -31,6 +37,9 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Pieces)
+		TArray<int> PiecesPositioning;
 
 	UFUNCTION()
 	void BoardGeneration();
