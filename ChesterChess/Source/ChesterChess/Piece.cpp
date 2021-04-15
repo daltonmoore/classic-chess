@@ -12,6 +12,7 @@ APiece::APiece()
 	PieceColor = 1;
 	PieceValue = 0;
 	FirstMove = true;
+	pieceType = EPawn;
 
 }
 
@@ -29,24 +30,24 @@ void APiece::Tick(float DeltaTime)
 
 }
 
-TArray<int> APiece::CalculateMoves(TArray<APiece*> Pieces, int CurrentPos)
+TSet<int> APiece::CalculateMoves(TArray<APiece*> Pieces, int CurrentPos)
 {
-	static TArray<int32> PossibleMoves;
+	static TSet<int32> PossibleMoves;
 	PossibleMoves.Add(2);
 	PossibleMoves.Add(3);
 
-	TArray<int32>* pointer = &PossibleMoves;
+	TSet<int32>* pointer = &PossibleMoves;
 
 	return PossibleMoves;
-}
-
-void APiece::TestingCalculateMoves()
-{
-	//TArray<int32> Point = APiece::CalculateMoves();
 }
 
 void APiece::SetFirstMove()
 {
 	FirstMove = false;
+}
+
+void APiece::SetFutureMoves(TArray<int32> Moves)
+{
+	FutureMoves = Moves;
 }
 

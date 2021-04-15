@@ -6,6 +6,13 @@
 #include "GameFramework/Actor.h"
 #include "Piece.generated.h"
 
+UENUM()
+
+enum PieceType
+{
+	EPawn, EKnight, EBishop, ERook, EQueen, EKing
+};
+
 UCLASS()
 class CHESTERCHESS_API APiece : public AActor
 {
@@ -28,22 +35,21 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
 		class UStaticMeshComponent* Mesh;
 
-	UPROPERTY()
-		FString PieceType;
-
-	UPROPERTY(EditAnywhere, Category = Pieces)
 		int PieceColor;
 	
 	UFUNCTION()
-		virtual TArray<int32> CalculateMoves(TArray<APiece*> Pieces, int CurrentPos);
-
-	UFUNCTION()
-		void TestingCalculateMoves();
+		virtual TSet<int32> CalculateMoves(TArray<APiece*> Pieces, int CurrentPos);
 		
 	void SetFirstMove();
+	void SetFutureMoves(TArray<int32> Moves);
 
 	int PieceValue;
+	PieceType pieceType;
+
+	UPROPERTY(EditAnywhere, Category = Pieces)
 	bool FirstMove;
+
+	TArray<int32> FutureMoves;
 
 
 };

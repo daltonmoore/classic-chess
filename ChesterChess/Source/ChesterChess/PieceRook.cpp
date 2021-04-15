@@ -6,24 +6,28 @@
 APieceRook::APieceRook(const FObjectInitializer& ObjectInitializer)
 {
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	static ConstructorHelpers::FObjectFinder<UStaticMesh>Pawn(TEXT("StaticMesh'/Game/StarterContent/Shapes/RookWhite.RookWhite'"));
-	UStaticMesh* PawnMesh = Pawn.Object;
+	static ConstructorHelpers::FObjectFinder<UStaticMesh>RookM(TEXT("StaticMesh'/Game/StarterContent/Shapes/RookWhite.RookWhite'"));
+	UStaticMesh* PawnMesh = RookM.Object;
 	Mesh->SetStaticMesh(PawnMesh);
 	PieceColor = 1;
+	PieceValue = 5;
+	pieceType = ERook;
+	FirstMove = true;
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Constructor"));
 }
 
-TArray<int32> APieceRook::CalculateMoves(TArray<APiece*> Pieces, int CurrentPos)
+TSet<int32> APieceRook::CalculateMoves(TArray<APiece*> Pieces, int CurrentPos)
 {
 	Super::CalculateMoves(Pieces, CurrentPos);
 	int tempCurrentPos = CurrentPos;
 
 	APiece* CurrentPiece = Pieces[CurrentPos];
 
-	TArray<int32> RookMoves;
+	TSet<int32> RookMoves;
 
 	//Create and populate array with all movement directions for the Rook
 	TArray<int> Directions;
+	Directions.SetNumUninitialized(4);
 	Directions.Add(1);
 	Directions.Add(-1);
 	Directions.Add(8);
@@ -48,8 +52,6 @@ TArray<int32> APieceRook::CalculateMoves(TArray<APiece*> Pieces, int CurrentPos)
 			if (Directions[i] == 1)
 			{
 				RowDone = ((tempCurrentPos + 1) % 8 == 0);
-				int rem = (tempCurrentPos + 1) % 8;
-				//UE_LOG(LogTemp, Error, TEXT("from current position %d"), rem);
 
 			}
 			else if (Directions[i] == -1)

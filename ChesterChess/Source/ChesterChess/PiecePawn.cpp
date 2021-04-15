@@ -6,27 +6,30 @@
 APiecePawn::APiecePawn(const FObjectInitializer& ObjectInitializer)
 {
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	static ConstructorHelpers::FObjectFinder<UStaticMesh>Pawn(TEXT("StaticMesh'/Game/StarterContent/Shapes/PawnWhite.PawnWhite'"));
-	UStaticMesh* PawnMesh = Pawn.Object;
+	static ConstructorHelpers::FObjectFinder<UStaticMesh>PawnM(TEXT("StaticMesh'/Game/StarterContent/Shapes/PawnWhite.PawnWhite'"));
+	UStaticMesh* PawnMesh = PawnM.Object;
 	Mesh->SetStaticMesh(PawnMesh);
 	PieceColor = 1;
+	PieceValue = 1;
+	pieceType = EPawn;
 	FirstMove = true;
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Constructor"));
 }
 
-TArray<int32> APiecePawn::CalculateMoves(TArray<APiece*> Pieces, int CurrentPos)
+TSet<int32> APiecePawn::CalculateMoves(TArray<APiece*> Pieces, int CurrentPos)
 {
 	Super::CalculateMoves(Pieces, CurrentPos);
 	int tempCurrentPos = CurrentPos;
 
 	APiece* CurrentPiece = Pieces[CurrentPos];
 
-	TArray<int32> PawnMoves;
+	TSet<int32> PawnMoves;
 
-	//Create and populate array with all movement directions for the King
+	//Create array and check whether the pawn is white or black (moves upwards or downwards)
 	TArray<int> Directions;
 	Directions.Add(8 * PieceColor);
 
+	//Add diagonal movement for capturing based on pawn's position
 	if (CurrentPos % 8 != 0)
 	{
 		if(PieceColor == 1)
@@ -57,19 +60,12 @@ TArray<int32> APiecePawn::CalculateMoves(TArray<APiece*> Pieces, int CurrentPos)
 		if (tempCurrentPos < 64 && tempCurrentPos >= 0)
 		{
 			CurrentPiece = Pieces[tempCurrentPos];
-			//UE_LOG(LogTemp, Error, TEXT("from current position %d"), CurrentPiece->PieceColor);
 
+			//Upwards and downwards movement
 			if (abs(Directions[i]) == 8)
 			{
 				if (Pieces[tempCurrentPos] == nullptr)
 				{
-					//If there is a piece of different color, add the piece to the possible moves and break the loop
-					/*if (Pieces[tempCurrentPos] != nullptr && CurrentPiece->PieceColor != PieceColor)
-					{
-						KingMoves.Add(tempCurrentPos);
-						UE_LOG(LogTemp, Warning, TEXT("adding position %d"), tempCurrentPos);
-						break;
-					}*/
 
 					PawnMoves.Add(tempCurrentPos);
 					UE_LOG(LogTemp, Warning, TEXT("adding position %d"), tempCurrentPos);
@@ -85,6 +81,7 @@ TArray<int32> APiecePawn::CalculateMoves(TArray<APiece*> Pieces, int CurrentPos)
 				}
 			}
 
+			//Diagonal movement for capturing enemy pieces
 			else
 			{
 				if (Pieces[tempCurrentPos] != nullptr && CurrentPiece->PieceColor != PieceColor)

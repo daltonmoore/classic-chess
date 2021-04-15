@@ -17,7 +17,7 @@ class CHESTERCHESS_API APieceQueen : public APiece
 		APieceQueen(const FObjectInitializer& ObjectInitializer);
 
 		
-		TArray<int32> CalculateMoves(TArray<APiece*> Pieces, int CurrentPos) override;
+		TSet<int32> CalculateMoves(TArray<APiece*> Pieces, int CurrentPos) override;
 
 	virtual void Tick(float DeltaTime) override;
 	

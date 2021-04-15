@@ -25,9 +25,11 @@ class CHESTERCHESS_API ABoardSpawn : public AActor
 
 		
 		class UMaterialInstance* BlackMaterial;
-		class UMaterial* WhiteMat;
+		class UMaterial* CheckedMat;
 		class UMaterial* GoldMesh;
-		class UMaterial* BlackSquares;
+
+		UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
+			TArray<UMaterial*> SquaresColor;
 
 
 		UPROPERTY(VisibleDefaultsOnly, Category = Mesh)
@@ -64,16 +66,29 @@ public:
 		int LastIndex;
 
 	UFUNCTION()
-	void BoardGeneration();
+	void PiecesMovement(FVector Position);
 
-	UFUNCTION()
-	void Clicking(FVector Position);
+	//TArray<int32> CheckForKingMove(int CurrentPos);
 
 	UPROPERTY(EditAnywhere, Category = PieceForSpawning)
 		TSubclassOf<class APiece> PieceToSpawn;
 	
+	int CurrentTurn;
+	int BlackKingPos;
+	int WhiteKingPos;
+
+	bool isMoveLegal;
+
 	TArray<APiece*> PiecesArray;
-	TArray<int32> CurrentMoves;
+	TSet<int32> CurrentMoves;
+
+	UPROPERTY(VisibleDefaultsOnly, Category = Positions)
+		TMap<int32, bool> WhiteKingMovesMap;
+	UPROPERTY(VisibleDefaultsOnly, Category = Positions)
+		TMap<int32, bool> BlackKingMovesMap;
+
+	bool isKingSafe(int PositionToCheck, TArray<APiece*> TempArray);
+
 
 
 };

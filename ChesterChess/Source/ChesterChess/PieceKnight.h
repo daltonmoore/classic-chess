@@ -16,6 +16,6 @@ class CHESTERCHESS_API APieceKnight : public APiece
 		APieceKnight(const FObjectInitializer& ObjectInitializer);
 
 
-	TArray<int32> CalculateMoves(TArray<APiece*> Pieces, int CurrentPos) override;
+	TSet<int32> CalculateMoves(TArray<APiece*> Pieces, int CurrentPos) override;
 	
 };

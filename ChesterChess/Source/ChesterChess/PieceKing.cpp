@@ -6,24 +6,28 @@
 APieceKing::APieceKing(const FObjectInitializer& ObjectInitializer)
 {
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	static ConstructorHelpers::FObjectFinder<UStaticMesh>Pawn(TEXT("StaticMesh'/Game/StarterContent/Shapes/KingWhite.KingWhite'"));
-	UStaticMesh* PawnMesh = Pawn.Object;
-	Mesh->SetStaticMesh(PawnMesh);
+	static ConstructorHelpers::FObjectFinder<UStaticMesh>KingM(TEXT("StaticMesh'/Game/StarterContent/Shapes/KingWhite.KingWhite'"));
+	UStaticMesh* KingMesh = KingM.Object;
+	Mesh->SetStaticMesh(KingMesh);
 	PieceColor = 1;
+	PieceValue = 100;
+	pieceType = EKing;
+	FirstMove = true;
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Constructor"));
 }
 
-TArray<int32> APieceKing::CalculateMoves(TArray<APiece*> Pieces, int CurrentPos)
+TSet<int32> APieceKing::CalculateMoves(TArray<APiece*> Pieces, int CurrentPos)
 {
 	Super::CalculateMoves(Pieces, CurrentPos);
 	int tempCurrentPos = CurrentPos;
 
 	APiece* CurrentPiece = Pieces[CurrentPos];
 
-	TArray<int32> KingMoves;
+	TSet<int32> KingMoves;
 
 	//Create and populate array with all movement directions for the King
 	TArray<int> Directions;
+	Directions.SetNumUninitialized(8);
 	Directions.Add(1);
 	Directions.Add(-1);
 	Directions.Add(8);
@@ -48,9 +52,6 @@ TArray<int32> APieceKing::CalculateMoves(TArray<APiece*> Pieces, int CurrentPos)
 		if (Directions[i] == 1 || Directions[i] == 9 || Directions[i] == -7)
 		{
 			RowDone = ((tempCurrentPos + 1) % 8 == 0);
-			int rem = (tempCurrentPos + 1) % 8;
-			//UE_LOG(LogTemp, Error, TEXT("from current position %d"), rem);
-
 		}
 		else if (Directions[i] == -1 || Directions[i] == -9 || Directions[i] == 7)
 		{
@@ -70,81 +71,36 @@ TArray<int32> APieceKing::CalculateMoves(TArray<APiece*> Pieces, int CurrentPos)
 
 			if (!RowDone && (Pieces[tempCurrentPos] == nullptr || (Pieces[tempCurrentPos] != nullptr && CurrentPiece->PieceColor != PieceColor)))
 			{
-				//If there is a piece of different color, add the piece to the possible moves and break the loop
-				/*if (Pieces[tempCurrentPos] != nullptr && CurrentPiece->PieceColor != PieceColor)
-				{
-					KingMoves.Add(tempCurrentPos);
-					UE_LOG(LogTemp, Warning, TEXT("adding position %d"), tempCurrentPos);
-					break;
-				}*/
-
 				KingMoves.Add(tempCurrentPos);
+
 				UE_LOG(LogTemp, Warning, TEXT("adding position %d"), tempCurrentPos);
+
+				//Check if castling is possible 
 
 				if (Directions[i] == 1 && FirstMove)
 				{
-					if (Pieces[tempCurrentPos + 1] == nullptr && Pieces[tempCurrentPos + 2]->FirstMove)
+					if (Pieces[tempCurrentPos + 1] == nullptr && Pieces[tempCurrentPos + 2] != nullptr && Pieces[tempCurrentPos + 2]->FirstMove)
 						KingMoves.Add(tempCurrentPos + 1);
-					/*bool CanCastle = true;
-					for(int j = 1; j < 3; j++)
-					{
-						if (Pieces[tempCurrentPos + j] == nullptr)
-						{
-							continue;
-						}
 
-						CanCastle = false;
-						break;
-					}
-
-					if (CanCastle)
-					{
-						if (Pieces[tempCurrentPos + 3]->FirstMove)
-						{
-							KingMoves.Add(tempCurrentPos + 3);
-						}
-					}*/
 				}
 
 				else if (Directions[i] == -1 && FirstMove)
 				{
-					if(Pieces[tempCurrentPos -1] == nullptr && (Pieces[tempCurrentPos - 2] == nullptr && Pieces[tempCurrentPos -3]->FirstMove))
+					if(Pieces[tempCurrentPos -1] == nullptr && Pieces[tempCurrentPos - 2] == nullptr && Pieces[tempCurrentPos - 3] != nullptr && Pieces[tempCurrentPos -3]->FirstMove)
 						KingMoves.Add(tempCurrentPos - 1);
 
-					/*bool CanCastle = true;
-					for (int j = -1; j < -4; j--)
-					{
-						if (Pieces[tempCurrentPos + j] == nullptr)
-						{
-							continue;
-						}
-
-						CanCastle = false;
-						break;
-					}
-
-					if (CanCastle)
-					{
-						if (Pieces[tempCurrentPos - 4]->FirstMove)
-						{
-							KingMoves.Add(tempCurrentPos - 4);
-						}
-					}*/
 				}
 
 			}
 
-			/*else
-				continue;*/
-
 		}
-
-		/*else
-			break;*/
-
 		
 
 	}
+
+
+
+	
 
 	return KingMoves;
 }

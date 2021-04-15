@@ -6,25 +6,28 @@
 APieceKnight::APieceKnight(const FObjectInitializer& ObjectInitializer)
 {
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	static ConstructorHelpers::FObjectFinder<UStaticMesh>Pawn(TEXT("StaticMesh'/Game/StarterContent/Shapes/KnightWhite.KnightWhite'"));
-	UStaticMesh* PawnMesh = Pawn.Object;
+	static ConstructorHelpers::FObjectFinder<UStaticMesh>KnightM(TEXT("StaticMesh'/Game/StarterContent/Shapes/KnightWhite.KnightWhite'"));
+	UStaticMesh* PawnMesh = KnightM.Object;
 	Mesh->SetStaticMesh(PawnMesh);
 	PieceColor = 1;
+	PieceValue = 3;
+	pieceType = EKnight;
 	FirstMove = true;
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Constructor"));
 }
 
-TArray<int32> APieceKnight::CalculateMoves(TArray<APiece*> Pieces, int CurrentPos)
+TSet<int32> APieceKnight::CalculateMoves(TArray<APiece*> Pieces, int CurrentPos)
 {
 	Super::CalculateMoves(Pieces, CurrentPos);
 	int tempCurrentPos = CurrentPos;
 
 	APiece* CurrentPiece = Pieces[CurrentPos];
 
-	TArray<int32> KnightMoves;
+	TSet<int32> KnightMoves;
 
-	//Create and populate array with all movement directions for the King
+	//Create and populate array with all movement directions for the knight
 	TArray<int> Directions;
+	Directions.SetNumUninitialized(8);
 	Directions.Add(15);
 	Directions.Add(-15);
 	Directions.Add(17);
@@ -60,16 +63,12 @@ TArray<int32> APieceKnight::CalculateMoves(TArray<APiece*> Pieces, int CurrentPo
 			RowDone = ((CurrentPos+1) % 8 == 0);
 		}
 
-
-
-
 		tempCurrentPos += Directions[i];
 
 		//Make sure we never go out of bounds
 		if (tempCurrentPos < 64 && tempCurrentPos >= 0)
 		{
 			CurrentPiece = Pieces[tempCurrentPos];
-			//UE_LOG(LogTemp, Error, TEXT("from current position %d"), CurrentPiece->PieceColor);
 
 			if (!RowDone && (Pieces[tempCurrentPos] == nullptr || (Pieces[tempCurrentPos] != nullptr && CurrentPiece->PieceColor != PieceColor)))
 			{
@@ -77,14 +76,7 @@ TArray<int32> APieceKnight::CalculateMoves(TArray<APiece*> Pieces, int CurrentPo
 				UE_LOG(LogTemp, Warning, TEXT("adding position %d"), tempCurrentPos);
 			}
 
-			/*else
-				continue;*/
-
 		}
-
-		/*else
-			break;*/
-
 
 
 	}

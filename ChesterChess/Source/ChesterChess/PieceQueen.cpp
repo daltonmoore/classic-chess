@@ -8,14 +8,17 @@
 APieceQueen::APieceQueen(const FObjectInitializer& ObjectInitializer)
 {
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	static ConstructorHelpers::FObjectFinder<UStaticMesh>Pawn(TEXT("StaticMesh'/Game/StarterContent/Shapes/QueenWhite.QueenWhite'"));
-	UStaticMesh* PawnMesh = Pawn.Object;
-	Mesh->SetStaticMesh(PawnMesh);
+	static ConstructorHelpers::FObjectFinder<UStaticMesh>Queen(TEXT("StaticMesh'/Game/StarterContent/Shapes/QueenWhite.QueenWhite'"));
+	UStaticMesh* QueenMesh = Queen.Object;
+	Mesh->SetStaticMesh(QueenMesh);
 	PieceColor = 1;
+	PieceValue = 9;
+	pieceType = EQueen;
+	FirstMove = true;
 	//GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Constructor"));
 }
 
-TArray<int32> APieceQueen::CalculateMoves(TArray<APiece*> Pieces, int CurrentPos)
+TSet<int32> APieceQueen::CalculateMoves(TArray<APiece*> Pieces, int CurrentPos)
 {
 	Super::CalculateMoves(Pieces, CurrentPos);
 
@@ -23,10 +26,11 @@ TArray<int32> APieceQueen::CalculateMoves(TArray<APiece*> Pieces, int CurrentPos
 
 	APiece* CurrentPiece = Pieces[CurrentPos];
 
-	TArray<int32> QueenMoves;
+	TSet<int32> QueenMoves;
 
 	//Create and populate array with all movement directions for the Queen
 	TArray<int> Directions; 
+	Directions.SetNumUninitialized(8);
 	Directions.Add(1);
 	Directions.Add(-1);
 	Directions.Add(8);
@@ -63,10 +67,7 @@ TArray<int32> APieceQueen::CalculateMoves(TArray<APiece*> Pieces, int CurrentPos
 			{
 				RowDone = (tempCurrentPos % 8 == 0);
 			}
-			
-
-			
-			
+						
 			tempCurrentPos += Directions[i];
 			
 			//Make sure we never go out of bounds

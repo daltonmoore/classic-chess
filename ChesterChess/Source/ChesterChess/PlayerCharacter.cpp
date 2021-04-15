@@ -69,7 +69,7 @@ void APlayerCharacter::MovePiece()
 		for (TActorIterator<ABoardSpawn> It(GetWorld()); It; ++It)
 		{
 			ABoardSpawn* BoardRef = *It;
-			BoardRef->Clicking(FVector(hit.Location));
+			BoardRef->PiecesMovement(FVector(hit.Location));
 		}
 		
 	}
